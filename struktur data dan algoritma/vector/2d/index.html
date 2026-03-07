@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jagged Vector 2D Visualizer - ARISE Study Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0a0505',
+                        'dark-lighter': '#150a0a',
+                        primary: '#90140c',
+                        secondary: '#f5eddd',
+                        accent: '#ff4d4d',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .vector-row {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            align-items: center;
+        }
+
+        .vector-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(144, 20, 12, 0.3);
+        }
+
+        .element {
+            min-width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(144, 20, 12, 0.1);
+            border: 2px solid rgba(144, 20, 12, 0.3);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #f5eddd;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .element.empty {
+            background: transparent;
+            border: 2px dashed rgba(245, 237, 221, 0.2);
+            color: rgba(245, 237, 221, 0.3);
+        }
+
+        .element.active {
+            background: #90140c;
+            border-color: #ff4d4d;
+            box-shadow: 0 0 20px rgba(144, 20, 12, 0.6);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .row-controls {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .vector-row:hover .row-controls {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(144, 20, 12, 0.4);
+            border-radius: 10px;
+        }
+
+        .code-container {
+            background: #0d0606;
+            border-left: 4px solid #90140c;
+        }
+
+        .highlight-line {
+            background: rgba(144, 20, 12, 0.3);
+            border-left: 3px solid #ff4d4d;
+            margin-left: -4px;
+            padding-left: 4px;
+            color: #fff;
+        }
+
+        .glass {
+            background: rgba(21, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-dark text-secondary font-sans min-h-screen selection:bg-primary selection:text-white pt-24 pb-12 px-6 overflow-x-hidden">
+    <!-- Navigation -->
+    <nav
+        class="fixed top-0 left-0 w-full z-50 bg-dark/80 backdrop-blur-xl border-b border-white/5 px-8 h-18 flex items-center justify-between shadow-2xl py-4">
+        <div class="flex items-center gap-8">
+            <a href="../../../index.html" class="flex items-center gap-2 group">
+                <div
+                    class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
+                    A</div>
+                <span class="text-sm font-bold tracking-tight text-secondary">ARISE <span
+                        class="text-primary italic">Vector</span></span>
+            </a>
+            <div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+            <div class="flex gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
+                <a href="../1d/index.html"
+                    class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-secondary/40 hover:text-white">1D
+                    Vector</a>
+                <a href="../2d/index.html"
+                    class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-primary/20 text-primary border border-primary/30 font-bold">2D
+                    Vector (Jagged)</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div class="absolute top-[10%] left-[20%] w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[20%] right-[10%] w-[30rem] h-[30rem] bg-accent/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div class="space-y-2">
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Jagged Vector <span
+                        class="text-primary italic">2D</span></h1>
+                <p class="text-secondary/50 font-medium text-sm">Visualization of vectors with non-uniform row lengths.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+                <button onclick="sortGlobal()"
+                    class="group flex items-center gap-3 px-6 py-4 bg-primary text-secondary rounded-2xl font-bold uppercase text-xs hover:bg-red-800 transition-all shadow-xl shadow-primary/20">
+                    <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                    </svg>
+                    Sort Rows (by first element)
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
+            <!-- Left: Visualization Area -->
+            <div class="xl:col-span-8 space-y-8">
+                <!-- Visual Container -->
+                <div
+                    class="glass rounded-[2.5rem] p-8 md:p-12 shadow-2xl min-h-[550px] flex flex-col relative overflow-hidden group">
+                    <div id="vector-container"
+                        class="w-full space-y-6 relative z-10 custom-scrollbar overflow-y-auto pr-4">
+                    </div>
+
+                    <div
+                        class="mt-auto pt-12 flex items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-secondary/20">
+                        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary/50"></span>
+                            Element</div>
+                        <div class="flex items-center gap-2"><span
+                                class="w-2 h-2 rounded-full border border-dashed border-secondary/20"></span> Unfilled
+                            (?)</div>
+                    </div>
+                </div>
+
+                <!-- Console -->
+                <div class="glass rounded-3xl overflow-hidden shadow-xl border border-white/5">
+                    <div class="px-6 py-4 bg-white/5 flex justify-between items-center border-b border-white/5">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-secondary/40">Terminal
+                            Trace</span>
+                        <button onclick="clearConsole()"
+                            class="text-[10px] text-primary hover:text-red-400 font-bold uppercase transition-colors">Clear</button>
+                    </div>
+                    <div id="terminal"
+                        class="p-6 font-mono text-xs text-emerald-400/90 h-32 overflow-y-auto custom-scrollbar leading-relaxed">
+                        <div class="opacity-50">[OK] Jagged Vector ready.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Controls & Code -->
+            <div class="xl:col-span-4 space-y-8">
+                <div class="glass rounded-[2rem] p-8 shadow-2xl border border-white/10 space-y-8">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-secondary/40">Control Center</h3>
+
+                    <div class="space-y-6">
+                        <div class="space-y-4">
+                            <label
+                                class="block text-[10px] font-bold uppercase tracking-wider text-secondary/30 ml-1">Select
+                                Row & Value</label>
+                            <div class="flex gap-3">
+                                <select id="row-select"
+                                    class="flex-1 bg-black/40 border border-white/10 rounded-2xl px-4 py-4 text-secondary text-sm outline-none focus:border-primary transition-all font-mono appearance-none">
+                                    <option value="0">Row 0</option>
+                                    <option value="1">Row 1</option>
+                                    <option value="2">Row 2</option>
+                                </select>
+                                <input type="number" id="input-val" value="15"
+                                    class="w-24 bg-black/40 border border-white/10 rounded-2xl px-4 py-4 text-center text-secondary text-sm outline-none focus:border-primary transition-all font-mono">
+                            </div>
+                            <button onclick="pushBack()"
+                                class="w-full py-4 bg-secondary/5 border border-white/10 text-secondary rounded-2xl font-bold uppercase text-[10px] hover:bg-white/10 transition-all">v[i].push_back(val)</button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="simulateNestedLoop()"
+                                class="py-4 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-bold uppercase text-[10px] hover:bg-accent/20 transition-all">Visualize
+                                Traversal</button>
+                            <button onclick="refreshPage()"
+                                class="py-4 border border-white/10 text-secondary rounded-2xl font-bold uppercase text-[10px] hover:bg-white/5 transition-all">Reset
+                                View</button>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 border-t border-white/10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-secondary/30">Execution
+                                Trace</span>
+                        </div>
+                        <div
+                            class="code-container rounded-2xl p-6 font-mono text-[11px] leading-relaxed shadow-inner overflow-hidden">
+                            <div id="code-block" class="text-secondary/60 space-y-1">
+                                <div id="line-1">for (int i = 0; i < v.size(); i++) {</div>
+                                        <div id="line-2" class="pl-4">for (int j = 0; j < v[i].size(); j++) {</div>
+                                                <div id="line-3" class="pl-8 text-primary">cout << v[i][j] << " "
+                                                        ;</div>
+                                                        <div id="line-4" class="pl-4">}</div>
+                                                        <div id="line-5">}</div>
+                                                </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    let vector2D = [[23, 45], [12, 67, 34, 89], [56, 11, 78]];
+                    let isAnimating = false;
+                    const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+                    function init() { render(); }
+
+                    function render() {
+                        const container = document.getElementById('vector-container');
+                        container.innerHTML = '';
+                        vector2D.forEach((row, i) => {
+                            const rowDiv = document.createElement('div');
+                            rowDiv.className = 'vector-row';
+                            rowDiv.id = `row-${i}`;
+                            rowDiv.innerHTML = `
+                    <div class="w-16 flex-shrink-0 flex flex-col items-center border-r border-white/10 pr-4 mr-2">
+                        <span class="text-[10px] uppercase font-bold text-secondary/20">v[${i}]</span>
+                        <span class="text-[14px] font-mono text-primary font-bold">${row.length}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-3 items-center flex-grow">
+                        ${row.map((val, j) => `<div class="element" id="el-${i}-${j}">${val}</div>`).join('')}
+                        <div class="element empty cursor-pointer hover:border-primary/50 transition-colors" onclick="document.getElementById('row-select').value=${i};document.getElementById('input-val').focus();">?</div>
+                    </div>
+                    <div class="row-controls">
+                        <button onclick="sortRow(${i})" class="p-2 hover:bg-primary/20 rounded-lg text-primary"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg></button>
+                        <button onclick="popBackRow(${i})" class="p-2 hover:bg-red-500/20 rounded-lg text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div>
+                `;
+                            container.appendChild(rowDiv);
+                        });
+                    }
+
+                    async function pushBack() {
+                        if (isAnimating) return;
+                        const r = parseInt(document.getElementById('row-select').value);
+                        const v = parseInt(document.getElementById('input-val').value);
+                        if (isNaN(v)) return;
+                        isAnimating = true;
+                        vector2D[r].push(v);
+                        render();
+                        const el = document.getElementById(`el-${r}-${vector2D[r].length - 1}`);
+                        if (el) { el.classList.add('active'); addLog(`v[${r}].push_back(${v});`); await sleep(600); el.classList.remove('active'); }
+                        isAnimating = false;
+                    }
+
+                    async function popBackRow(i) {
+                        if (isAnimating || vector2D[i].length === 0) return;
+                        isAnimating = true;
+                        addLog(`v[${i}].pop_back();`);
+                        vector2D[i].pop();
+                        render();
+                        isAnimating = false;
+                    }
+
+                    async function sortRow(i) {
+                        if (isAnimating || vector2D[i].length < 2) return;
+                        isAnimating = true;
+                        addLog(`sort(v[${i}].begin(), v[${i}].end());`);
+                        await sleep(500);
+                        vector2D[i].sort((a, b) => a - b);
+                        render();
+                        isAnimating = false;
+                    }
+
+                    async function sortGlobal() {
+                        if (isAnimating || vector2D.length < 2) return;
+                        isAnimating = true;
+                        addLog(`Sorting rows by first element (v[i][0])`);
+                        vector2D.sort((a, b) => (a[0] || 0) - (b[0] || 0));
+                        render();
+                        await sleep(600);
+                        isAnimating = false;
+                    }
+
+                    async function simulateNestedLoop() {
+                        if (isAnimating) return;
+                        isAnimating = true;
+                        clearConsole();
+
+                        for (let i = 0; i < vector2D.length; i++) {
+                            highlightCode(1);
+                            addLog(`Outer loop: i = ${i}`);
+                            const rowEl = document.getElementById(`row-${i}`);
+                            rowEl.classList.add('bg-white/10');
+                            await sleep(500);
+
+                            highlightCode(2);
+                            for (let j = 0; j < vector2D[i].length; j++) {
+                                highlightCode(3);
+                                const el = document.getElementById(`el-${i}-${j}`);
+                                el.classList.add('active');
+                                addLog(`  Element at v[${i}][${j}] = ${vector2D[i][j]}`);
+                                await sleep(600);
+                                el.classList.remove('active');
+                            }
+
+                            highlightCode(4);
+                            rowEl.classList.remove('bg-white/10');
+                            await sleep(300);
+                        }
+                        highlightCode(5);
+                        await sleep(400);
+                        highlightCode(0);
+                        addLog(`Traversal finished.`);
+                        isAnimating = false;
+                    }
+
+                    function highlightCode(lineNum) {
+                        for (let i = 1; i <= 5; i++) {
+                            const line = document.getElementById(`line-${i}`);
+                            if (i === lineNum) line.classList.add('highlight-line');
+                            else line.classList.remove('highlight-line');
+                        }
+                    }
+
+                    function addLog(m) {
+                        const t = document.getElementById('terminal');
+                        const d = document.createElement('div');
+                        d.innerHTML = `<span class="opacity-40">>></span> ${m}`;
+                        t.appendChild(d); t.scrollTop = t.scrollHeight;
+                    }
+
+                    function clearConsole() { document.getElementById('terminal').innerHTML = ''; }
+                    function refreshPage() { window.location.reload(); }
+
+                    init();
+                </script>
+</body>
+
+</html>

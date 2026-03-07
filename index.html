@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARISE Study Club - Competitive Programming Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0a0505',
+                        'dark-lighter': '#1a0d0d',
+                        primary: '#90140c',
+                        secondary: '#f5eddd',
+                        accent: '#90140c'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    boxShadow: {
+                        'neon-red': '0 0 15px -3px rgba(144, 20, 12, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .glass-card {
+            background: rgba(26, 13, 13, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(245, 237, 221, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(10, 5, 5, 0.3);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2a1515;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #90140c;
+        }
+
+        .neon-border-hover:hover {
+            border-color: #90140c;
+            box-shadow: 0 0 15px -3px rgba(144, 20, 12, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-secondary/90 font-sans min-h-screen selection:bg-primary selection:text-white">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 flex-shrink-0 bg-dark-lighter border-r border-primary/20 hidden md:flex flex-col">
+            <div class="p-6">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-primary to-red-950 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-neon-red">
+                        A</div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight text-secondary">ARISE <span
+                                class="text-primary font-bold">Study</span></h1>
+                        <p class="text-[10px] uppercase tracking-widest text-secondary/40 font-semibold">Competitive
+                            Programming</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 px-4 mt-6 overflow-y-auto custom-scrollbar">
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="px-4 text-[11px] font-bold text-secondary/30 uppercase tracking-widest mb-4">Materi
+                            Utama</h3>
+                        <ul class="space-y-1">
+                            <li><a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 transition-all text-secondary/60 hover:text-white group"><span
+                                        class="font-medium text-sm">Dasar Pemrograman</span></a></li>
+                            <li><a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/20 text-secondary border border-primary/30 group"><span
+                                        class="font-medium text-sm">Struktur Data & Algoritma</span></a></li>
+                            <li><a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 transition-all text-secondary/60 hover:text-white group"><span
+                                        class="font-medium text-sm">Strategi Algoritma</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden" id="main-view">
+            <header
+                class="h-20 flex-shrink-0 flex items-center justify-between px-8 bg-dark/50 backdrop-blur-md border-b border-secondary/5 z-10 sticky top-0">
+                <div class="flex items-center gap-4 flex-1">
+                    <h2 class="text-xl font-bold text-secondary">Dashboard</h2>
+                </div>
+            </header>
+
+            <div id="library-view" class="flex-1 overflow-y-auto custom-scrollbar p-8">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold tracking-tight mb-2 text-secondary">Struktur Data & Algoritma</h2>
+                    <p class="text-secondary/50">Bangun fondasi pengetahuan pemrograman kompetitif Anda di sini.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="material-grid">
+                </div>
+            </div>
+
+            <div id="detail-view" class="hidden flex-1 flex flex-col overflow-hidden">
+                <div class="h-12 bg-dark-lighter border-b border-secondary/5 flex items-center justify-between px-6">
+                    <button onclick="showLibrary()"
+                        class="text-secondary/50 hover:text-secondary flex items-center gap-2 transition-colors"><span>Back
+                            to Library</span></button>
+                    <h3 id="current-material-title" class="text-sm font-bold text-primary uppercase"></h3>
+                </div>
+                <div class="flex-1 flex flex-col lg:flex-row overflow-hidden bg-slate-950 p-8 text-secondary/50">
+                    Pilih materi Array 2D untuk visualisasi interaktif atau materi lain untuk melihat detail (Work in
+                    progress).
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const materials = [
+            { name: "Array", difficulty: "Beginner", icon: "📦" },
+            { name: "Struct", difficulty: "Beginner", icon: "📑" },
+            { name: "Pair", difficulty: "Beginner", icon: "👥" },
+            { name: "Array 2D", difficulty: "Easy", icon: "📊" },
+            { name: "Vector", difficulty: "Easy", icon: "➡️" },
+            { name: "Linked List", difficulty: "Medium", icon: "🔗" },
+            { name: "Stack", difficulty: "Medium", icon: "📚" },
+            { name: "Set", difficulty: "Medium", icon: "🧮" },
+            { name: "Map", difficulty: "Medium", icon: "🗺️" },
+            { name: "Queue", difficulty: "Medium", icon: "🔄" },
+            { name: "Priority Queue", difficulty: "Hard", icon: "⚡" },
+            { name: "Tree", difficulty: "Hard", icon: "🌲" },
+            { name: "Graph", difficulty: "Extreme", icon: "🕸️" }
+        ];
+
+        const grid = document.getElementById('material-grid');
+
+        function renderCards() {
+            grid.innerHTML = materials.map((m, index) => {
+                let action = `showDetail('${m.name}')`;
+                if (m.name === "Array 2D") action = `window.location.href='./struktur data dan algoritma/array 2d/index.html'`;
+                if (m.name === "Vector") action = `window.location.href='./struktur data dan algoritma/vector/1d/index.html'`;
+                return `
+                <div onclick="${action}" class="glass-card p-6 rounded-3xl hover:-translate-y-2 transition-all cursor-pointer group neon-border-hover animate-fade-in" style="animation-delay: ${index * 0.05}s">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary/20 transition-colors"><span class="text-2xl">${m.icon}</span></div>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getDifficultyClass(m.difficulty)}">${m.difficulty}</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-1 group-hover:text-primary transition-colors text-secondary">${m.name}</h4>
+                    <p class="text-sm text-secondary/40">Learn implementation & complexity.</p>
+                </div>`;
+            }).join('');
+        }
+
+        function getDifficultyClass(d) {
+            if (d === 'Beginner') return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+            if (d === 'Easy') return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+            if (d === 'Medium') return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+            if (d === 'Hard') return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+            return 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
+        }
+
+        function showDetail(n) {
+            document.getElementById('library-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.remove('hidden');
+            document.getElementById('current-material-title').innerText = n;
+        }
+
+        function showLibrary() {
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('library-view').classList.remove('hidden');
+        }
+
+        renderCards();
+    </script>
+</body>
+
+</html>

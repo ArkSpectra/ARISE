@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisasi Vector 1D - ARISE Study Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0a0505',
+                        'dark-lighter': '#1a0d0d',
+                        primary: '#90140c',
+                        secondary: '#f5eddd',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .vector-container {
+            display: flex;
+            gap: 12px;
+            min-height: 80px;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.5s ease;
+            flex-wrap: wrap;
+        }
+
+        .element {
+            min-width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(144, 20, 12, 0.1);
+            border: 1px solid rgba(144, 20, 12, 0.3);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            color: #f5eddd;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .element.new {
+            transform: scale(0);
+            opacity: 0;
+            animation: spawn 0.4s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .element.removing {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .element.active {
+            background: #90140c;
+            color: white;
+            border-color: #f5eddd;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(144, 20, 12, 0.5);
+            z-index: 10;
+        }
+
+        .element.swapping {
+            background: #facc15;
+            color: black;
+            border-color: transparent;
+        }
+
+        .index-label {
+            position: absolute;
+            top: -20px;
+            font-size: 10px;
+            color: rgba(245, 237, 221, 0.3);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        @keyframes spawn {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #331111;
+            border-radius: 10px;
+        }
+
+        .code-highlight {
+            background: rgba(144, 20, 12, 0.3);
+            border-left: 3px solid #90140c;
+            padding-left: 8px;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-dark text-secondary/90 font-sans min-h-screen pt-24 pb-8 px-4 md:px-8 selection:bg-primary selection:text-white overflow-x-hidden">
+    <!-- Navigation -->
+    <nav
+        class="fixed top-0 left-0 w-full z-50 bg-dark/80 backdrop-blur-xl border-b border-white/5 px-8 h-18 flex items-center justify-between shadow-2xl py-4">
+        <div class="flex items-center gap-8">
+            <a href="../../../index.html" class="flex items-center gap-2 group">
+                <div
+                    class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
+                    A</div>
+                <span class="text-sm font-bold tracking-tight text-secondary">ARISE <span
+                        class="text-primary italic">Vector</span></span>
+            </a>
+            <div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+            <div class="flex gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
+                <a href="../1d/index.html"
+                    class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-primary/20 text-primary border border-primary/30">1D
+                    Vector</a>
+                <a href="../2d/index.html"
+                    class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-secondary/40 hover:text-white">2D
+                    Vector</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <a href="../../index.html"
+                    class="text-primary hover:text-red-400 flex items-center gap-2 mb-2 transition-colors group">
+                    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span class="text-xs font-bold uppercase tracking-widest">Dashboard</span>
+                </a>
+                <h1 class="text-3xl font-bold">Vector 1D <span class="text-primary italic">Visualizer</span></h1>
+            </div>
+            <div class="flex gap-4">
+                <div
+                    class="bg-dark-lighter border border-white/5 px-6 py-3 rounded-2xl flex items-center gap-6 shadow-xl">
+                    <div class="space-y-0.5">
+                        <span
+                            class="text-[10px] uppercase font-bold text-secondary/30 block tracking-widest">v.size()</span>
+                        <span id="size-val" class="font-mono text-xl text-primary font-bold">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 space-y-6">
+                <div
+                    class="bg-dark-lighter border border-white/5 p-12 rounded-[2.5rem] shadow-2xl min-h-[400px] flex flex-col justify-center relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+                        <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4 11h16v2H4zm0-4h16v2H4zm0 8h16v2H4z" />
+                        </svg>
+                    </div>
+                    <div class="relative z-10 w-full">
+                        <div id="empty-state"
+                            class="text-secondary/20 font-medium italic text-sm w-full text-center py-10">Vector is
+                            empty. Push some values!</div>
+                        <div id="vector-container" class="vector-container box-border"></div>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 border border-white/5 rounded-3xl overflow-hidden shadow-xl">
+                    <div class="px-5 py-3 bg-white/5 border-b border-white/5 flex justify-between items-center">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-secondary/40">Console
+                            Output</span>
+                        <button onclick="clearConsole()"
+                            class="text-[10px] text-primary hover:text-red-400 font-bold uppercase">Clear</button>
+                    </div>
+                    <div id="terminal"
+                        class="p-5 font-mono text-sm text-emerald-400 h-28 overflow-y-auto custom-scrollbar whitespace-pre-wrap leading-relaxed italic">
+                        System ready.
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+                <div
+                    class="bg-dark-lighter border border-white/5 rounded-[2.5rem] p-6 shadow-2xl space-y-6 text-center lg:text-left">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-secondary/30 px-2">std::vector
+                        Operations</h3>
+                    <div class="space-y-4">
+                        <div class="p-5 bg-black/20 rounded-3xl border border-white/5 space-y-4">
+                            <div class="space-y-1 text-left">
+                                <label class="text-[9px] uppercase text-secondary/40 px-2 font-bold">Value to
+                                    Push</label>
+                                <input type="number" id="push-val" value="10"
+                                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-secondary outline-none focus:border-primary transition-all font-mono">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="pushBack()"
+                                    class="bg-primary text-secondary py-3 rounded-xl text-[10px] font-bold uppercase hover:bg-red-800 transition-all shadow-lg shadow-primary/20">push_back</button>
+                                <button onclick="popBack()"
+                                    class="bg-white/5 text-secondary py-3 rounded-xl text-[10px] font-bold uppercase hover:bg-white/10 transition-all border border-white/5">pop_back</button>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-black/20 rounded-3xl border border-white/5 space-y-4">
+                            <h4 class="text-[9px] font-bold uppercase text-secondary/40 text-left px-1">Specific
+                                Position</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1 text-left">
+                                    <label class="text-[9px] uppercase text-secondary/30 px-1 font-bold">Index</label>
+                                    <input type="number" id="op-pos" value="0" min="0"
+                                        class="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-xs text-secondary outline-none focus:border-primary font-mono">
+                                </div>
+                                <div class="space-y-1 text-left">
+                                    <label class="text-[9px] uppercase text-secondary/30 px-1 font-bold">Value</label>
+                                    <input type="number" id="op-val" value="99"
+                                        class="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-xs text-secondary outline-none focus:border-primary font-mono">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="insertAt()"
+                                    class="py-2.5 bg-secondary/10 text-secondary hover:bg-secondary/20 rounded-xl text-[10px] font-bold uppercase transition-all shadow-inner">insert</button>
+                                <button onclick="eraseAt()"
+                                    class="py-2.5 bg-red-950/20 text-red-500 border border-red-500/20 hover:bg-red-500/10 rounded-xl text-[10px] font-bold uppercase transition-all">erase</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="sortVector('asc')"
+                                class="py-3 border border-emerald-500/20 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/20 rounded-xl text-[10px] font-bold uppercase transition-all flex items-center justify-center gap-2">Sort
+                                ASC</button>
+                            <button onclick="sortVector('desc')"
+                                class="py-3 border border-orange-500/20 text-orange-400 bg-orange-500/5 hover:bg-orange-500/20 rounded-xl text-[10px] font-bold uppercase transition-all flex items-center justify-center gap-2">Sort
+                                DESC</button>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-white/5 space-y-4">
+                        <div class="flex items-center justify-between px-2">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-secondary/30">C++
+                                Implementation</span>
+                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        </div>
+                        <div id="code-box"
+                            class="bg-black/50 rounded-2xl p-6 font-mono text-[10px] text-left leading-relaxed border border-white/5 text-secondary/60 shadow-inner min-h-[100px]">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vector = [];
+        let isAnimating = false;
+        const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+        function init() { updateUI(); }
+
+        function updateUI() {
+            const container = document.getElementById('vector-container');
+            const empty = document.getElementById('empty-state');
+            document.getElementById('size-val').innerText = vector.length;
+
+            container.innerHTML = '';
+            if (vector.length === 0) {
+                empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                vector.forEach((val, idx) => {
+                    container.appendChild(createElement(val, idx));
+                });
+            }
+            updateCodeSnippet();
+        }
+
+        function createElement(val, idx, isNew = false) {
+            const div = document.createElement('div');
+            div.className = `element ${isNew ? 'new' : ''}`;
+            div.id = `el-${idx}`;
+            div.innerHTML = `<span class="index-label">${idx}</span>${val}`;
+            return div;
+        }
+
+        async function pushBack() {
+            if (isAnimating) return;
+            const value = document.getElementById('push-val').value;
+            if (value === "") return;
+
+            isAnimating = true;
+            vector.push(value);
+            updateUI(); // Immediate DOM update
+
+            const lastIdx = vector.length - 1;
+            const el = document.getElementById(`el-${lastIdx}`);
+            if (el) el.classList.add('new');
+
+            printConsole(`v.push_back(${value});`);
+            updateCodeSnippet(`v.push_back(${value});`);
+            await sleep(400);
+            isAnimating = false;
+        }
+
+        async function popBack() {
+            if (isAnimating || vector.length === 0) return;
+            isAnimating = true;
+
+            const idx = vector.length - 1;
+            const el = document.getElementById(`el-${idx}`);
+            if (el) el.classList.add('removing');
+
+            printConsole(`v.pop_back();`);
+            updateCodeSnippet(`v.pop_back();`);
+            await sleep(400);
+
+            vector.pop();
+            updateUI();
+            isAnimating = false;
+        }
+
+        async function insertAt() {
+            if (isAnimating) return;
+            const pos = parseInt(document.getElementById('op-pos').value);
+            const val = document.getElementById('op-val').value;
+            if (isNaN(pos) || pos < 0 || pos > vector.length) { alert("Index out of range!"); return; }
+
+            isAnimating = true;
+            printConsole(`v.insert(v.begin() + ${pos}, ${val});`);
+            updateCodeSnippet(`v.insert(v.begin() + ${pos}, ${val});`);
+
+            // Animation sequence
+            for (let i = vector.length - 1; i >= pos; i--) {
+                const el = document.getElementById(`el-${i}`);
+                if (el) { el.classList.add('active'); await sleep(100); el.classList.remove('active'); }
+            }
+
+            vector.splice(pos, 0, val);
+            updateUI();
+            const newEl = document.getElementById(`el-${pos}`);
+            if (newEl) newEl.classList.add('active');
+            await sleep(300);
+            if (newEl) newEl.classList.remove('active');
+
+            isAnimating = false;
+        }
+
+        async function eraseAt() {
+            if (isAnimating || vector.length === 0) return;
+            const pos = parseInt(document.getElementById('op-pos').value);
+            if (isNaN(pos) || pos < 0 || pos >= vector.length) { alert("Index out of range!"); return; }
+
+            isAnimating = true;
+            printConsole(`v.erase(v.begin() + ${pos});`);
+            updateCodeSnippet(`v.erase(v.begin() + ${pos});`);
+
+            const el = document.getElementById(`el-${pos}`);
+            if (el) el.classList.add('removing');
+            await sleep(400);
+
+            for (let i = pos + 1; i < vector.length; i++) {
+                const nextEl = document.getElementById(`el-${i}`);
+                if (nextEl) { nextEl.classList.add('active'); await sleep(100); nextEl.classList.remove('active'); }
+            }
+
+            vector.splice(pos, 1);
+            updateUI();
+            isAnimating = false;
+        }
+
+        async function sortVector(dir) {
+            if (isAnimating || vector.length < 2) return;
+            isAnimating = true;
+            printConsole(`std::sort(v.begin(), v.end());`);
+            updateCodeSnippet(`std::sort(v.begin(), v.end());`);
+
+            for (let i = 0; i < vector.length; i++) {
+                for (let j = 0; j < vector.length - i - 1; j++) {
+                    const el1 = document.getElementById(`el-${j}`);
+                    const el2 = document.getElementById(`el-${j + 1}`);
+                    el1.classList.add('swapping'); el2.classList.add('swapping');
+
+                    const v1 = Number(vector[j]); const v2 = Number(vector[j + 1]);
+                    const shouldSwap = dir === 'asc' ? v1 > v2 : v1 < v2;
+
+                    if (shouldSwap) {
+                        await sleep(200);
+                        [vector[j], vector[j + 1]] = [vector[j + 1], vector[j]];
+                        el1.innerHTML = `<span class="index-label">${j}</span>${vector[j]}`;
+                        el2.innerHTML = `<span class="index-label">${j + 1}</span>${vector[j + 1]}`;
+                        el1.classList.add('active'); el2.classList.add('active');
+                        await sleep(200);
+                        el1.classList.remove('active'); el2.classList.remove('active');
+                    } else { await sleep(150); }
+                    el1.classList.remove('swapping'); el2.classList.remove('swapping');
+                }
+            }
+            updateUI();
+            isAnimating = false;
+        }
+
+        function updateCodeSnippet(action = "") {
+            const box = document.getElementById('code-box');
+            let html = `<div class="text-primary space-y-1"><div>std::vector&lt;int&gt; v;</div>`;
+            if (action) html += `<div class="code-highlight">${action}</div>`;
+            html += `<div class="mt-4 text-secondary/40">// Memory: { ${vector.join(', ')} }</div></div>`;
+            box.innerHTML = html;
+        }
+
+        function printConsole(msg) {
+            const t = document.getElementById('terminal');
+            t.innerText += `\n> ${msg}`; t.scrollTop = t.scrollHeight;
+        }
+        function clearConsole() { document.getElementById('terminal').innerText = "> Console cleared."; }
+        init();
+    </script>
+</body>
+
+</html>

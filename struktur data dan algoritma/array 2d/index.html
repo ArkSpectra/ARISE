@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisasi Array 2D - ARISE Study Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0a0505',
+                        'dark-lighter': '#1a0d0d',
+                        primary: '#90140c',
+                        secondary: '#f5eddd',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .cell {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(245, 237, 221, 0.05);
+        }
+
+        .cell-active {
+            background-color: #facc15 !important;
+            color: #000 !important;
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+            border-color: transparent;
+        }
+
+        .cell-filled {
+            background-color: rgba(144, 20, 12, 0.2);
+            color: #f5eddd;
+            border-color: #90140c;
+        }
+
+        .cell-target {
+            background-color: #90140c !important;
+            color: #f5eddd !important;
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(144, 20, 12, 0.6);
+            z-index: 20;
+            border-color: #f5eddd;
+        }
+
+        .code-highlight {
+            background-color: rgba(144, 20, 12, 0.4);
+            border-left: 4px solid #90140c;
+            padding-left: 8px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #331111;
+            border-radius: 10px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #90140c;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s infinite;
+            border-color: #ef4444;
+        }
+
+        .tab-active {
+            color: #f5eddd;
+            border-bottom: 2px solid #90140c;
+            background: rgba(144, 20, 12, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-secondary/90 font-sans min-h-screen p-4 md:p-8 selection:bg-primary selection:text-white">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <a href="../../index.html"
+                    class="text-primary hover:text-red-400 flex items-center gap-2 mb-2 transition-colors group">
+                    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span class="text-xs font-bold uppercase tracking-widest">Dashboard</span>
+                </a>
+                <h1 class="text-3xl font-bold">Array 2D <span class="text-primary italic">Visualizer v2.0</span></h1>
+            </div>
+            <div class="flex gap-4 items-center">
+                <div class="bg-black/40 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-sm">
+                    <span class="text-[10px] font-bold text-secondary/40 uppercase block mb-1">Iterator Status</span>
+                    <div class="flex gap-4 font-mono text-sm">
+                        <span class="text-primary font-bold">i: <span id="status-i"
+                                class="text-secondary text-lg">?</span></span>
+                        <span class="text-primary font-bold">j: <span id="status-j"
+                                class="text-secondary text-lg">?</span></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+            <!-- Left: Grid View -->
+            <div class="lg:col-span-7 space-y-6">
+                <div
+                    class="bg-dark-lighter border border-white/5 p-8 rounded-[2rem] shadow-2xl min-h-[500px] flex flex-col items-center justify-center relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm0 0h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z" />
+                        </svg>
+                    </div>
+                    <div id="grid-container" class="relative z-10 w-full max-w-lg"></div>
+                </div>
+
+                <div class="bg-black border border-white/5 rounded-3xl overflow-hidden shadow-xl">
+                    <div class="px-4 py-2 bg-white/5 border-b border-white/5 flex justify-between items-center">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-secondary/30">Output
+                            Terminal</span>
+                        <button onclick="clearConsole()"
+                            class="text-[10px] text-primary hover:text-red-400 uppercase font-bold">Clear</button>
+                    </div>
+                    <div id="console-out"
+                        class="font-mono text-sm text-emerald-400 h-32 overflow-y-auto custom-scrollbar p-4 whitespace-pre">
+                        Welcome to ARISE Virtual C++...</div>
+                </div>
+            </div>
+
+            <!-- Right: Panel -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <div
+                    class="bg-dark-lighter border border-white/5 rounded-[2rem] overflow-hidden flex flex-col flex-1 shadow-2xl">
+                    <div class="flex border-b border-white/5">
+                        <button onclick="setUIMode('input')" id="tab-input"
+                            class="flex-1 py-4 font-bold text-sm uppercase tracking-widest text-secondary/40 transition-all tab-active">Mode
+                            Input</button>
+                        <button onclick="setUIMode('output')" id="tab-output"
+                            class="flex-1 py-4 font-bold text-sm uppercase tracking-widest text-secondary/40 transition-all">Mode
+                            Output</button>
+                    </div>
+
+                    <div class="p-6 flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+                        <!-- Input Configuration -->
+                        <div id="panel-input" class="space-y-6">
+                            <div class="flex gap-2 p-1 bg-black/50 rounded-xl border border-white/5">
+                                <button onclick="setInputSubMode('decl')" id="btn-sub-decl"
+                                    class="flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all bg-primary/20 text-secondary">A:
+                                    Deklarasi</button>
+                                <button onclick="setInputSubMode('cin')" id="btn-sub-cin"
+                                    class="flex-1 py-2 text-[10px] font-bold uppercase rounded-lg transition-all text-secondary/40">B:
+                                    cin Simulation</button>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex gap-4">
+                                    <div class="flex-1 space-y-1">
+                                        <label class="text-[10px] font-bold uppercase text-secondary/30">Rows
+                                            (R)</label>
+                                        <input type="number" id="input-rows" value="3" min="1" max="5"
+                                            class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-2 text-secondary focus:border-primary outline-none transition-all font-mono">
+                                    </div>
+                                    <div class="flex-1 space-y-1">
+                                        <label class="text-[10px] font-bold uppercase text-secondary/30">Cols
+                                            (C)</label>
+                                        <input type="number" id="input-cols" value="4" min="1" max="6"
+                                            class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-2 text-secondary focus:border-primary outline-none transition-all font-mono">
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <label id="label-values"
+                                        class="text-[10px] font-bold uppercase text-secondary/30">Input Data</label>
+                                    <textarea id="val-input"
+                                        class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-xs font-mono text-secondary h-32 custom-scrollbar focus:border-primary outline-none transition-all whitespace-pre leading-relaxed"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Output Tools -->
+                        <div id="panel-output" class="hidden space-y-6">
+                            <div class="p-4 bg-primary/5 border border-primary/20 rounded-2xl">
+                                <h4 class="text-[10px] font-bold text-primary uppercase mb-3 px-1">Manipulate Element
+                                </h4>
+                                <div class="flex gap-3 items-end">
+                                    <div class="w-16 space-y-1">
+                                        <label class="text-[9px] uppercase text-secondary/40 px-1 font-bold">Row</label>
+                                        <input type="number" id="search-row" value="0" min="0"
+                                            class="w-full bg-black/30 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-secondary outline-none focus:border-primary font-mono">
+                                    </div>
+                                    <div class="w-16 space-y-1">
+                                        <label class="text-[9px] uppercase text-secondary/40 px-1 font-bold">Col</label>
+                                        <input type="number" id="search-col" value="0" min="0"
+                                            class="w-full bg-black/30 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-secondary outline-none focus:border-primary font-mono">
+                                    </div>
+                                    <div class="flex-1 space-y-1">
+                                        <label class="text-[9px] uppercase text-secondary/40 px-1 font-bold">New
+                                            Value</label>
+                                        <input type="text" id="search-val" placeholder="Stay same"
+                                            class="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-secondary outline-none focus:border-primary font-mono">
+                                    </div>
+                                    <button onclick="manipulateElement()"
+                                        class="px-3 py-1.5 bg-primary/20 text-primary border border-primary/30 rounded-lg text-[10px] font-bold uppercase hover:bg-primary/30 transition-all font-bold">Update</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Code & Execution -->
+                        <div class="mt-auto pt-6 border-t border-white/5 space-y-6">
+                            <div>
+                                <div class="flex items-center justify-between mb-3 px-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest text-secondary/30">Preview
+                                        C++ Code</span>
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                </div>
+                                <div id="code-snippet-container"
+                                    class="bg-black/50 rounded-2xl p-6 font-mono text-[11px] leading-relaxed shadow-inner overflow-x-auto border border-white/5 min-h-[140px]">
+                                </div>
+                            </div>
+
+                            <div id="execution-area" class="space-y-4">
+                                <!-- Dynamic Main Buttons -->
+                                <div id="main-actions" class="flex flex-col gap-3">
+                                    <button id="btn-apply" onclick="handleApply()"
+                                        class="w-full py-4 bg-primary text-secondary rounded-2xl font-bold uppercase tracking-wider hover:bg-red-800 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                        <span id="btn-apply-text">Apply & Declare</span>
+                                    </button>
+                                    <button id="btn-start-sim" onclick="startSim()"
+                                        class="hidden w-full py-4 bg-primary text-secondary rounded-2xl font-bold uppercase tracking-wider hover:bg-red-800 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                            </path>
+                                        </svg>
+                                        <span>Start Simulation</span>
+                                    </button>
+                                </div>
+
+                                <!-- Simulation Controls (Pause/Stop/Step) -->
+                                <div id="sim-controls"
+                                    class="hidden bg-dark pl-4 pr-4 pb-4 rounded-3xl border border-white/5 pt-6 animate-fade-in relative">
+                                    <div class="flex flex-col gap-6">
+                                        <div class="space-y-4">
+                                            <div class="flex justify-between items-center px-1">
+                                                <span
+                                                    class="text-[10px] font-bold uppercase text-secondary/30">Animation
+                                                    Speed</span>
+                                                <span id="speed-val"
+                                                    class="font-mono text-[10px] text-primary">Normal</span>
+                                            </div>
+                                            <input type="range" id="sim-speed" min="100" max="2000" value="800"
+                                                class="w-full accent-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                                        </div>
+
+                                        <div class="flex gap-2">
+                                            <button onclick="pauseSimulation()" id="btn-pause"
+                                                class="flex-1 py-3 bg-secondary/10 text-secondary rounded-xl font-bold uppercase text-[10px] hover:bg-secondary/20 transition-all">Pause</button>
+                                            <button onclick="stepSimulation()" id="btn-step"
+                                                class="flex-1 py-3 bg-primary/20 text-primary border border-primary/20 rounded-xl font-bold uppercase text-[10px] hover:bg-primary/30 transition-all">Step
+                                                Next</button>
+                                            <button onclick="cancelSimulation()"
+                                                class="flex-1 py-3 bg-red-950/30 text-red-500 rounded-xl font-bold uppercase text-[10px] border border-red-500/20 hover:bg-red-500/10 transition-all">Stop</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appState = {
+            uiMode: 'input',
+            inputSubMode: 'decl',
+            rows: 3,
+            cols: 4,
+            gridData: [],
+            buffer: [],
+            isSimulating: false,
+            isPaused: false,
+            currentI: -1,
+            currentJ: -1,
+            simulationType: null, // 'cin' or 'output'
+            timer: null
+        };
+
+        const DEFAULTS = {
+            decl: "{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}",
+            cin: "10 25 30 44 55 60 77 88 99 100 110 120"
+        };
+
+        function init() {
+            renderGrid();
+            updateCodeSnippet();
+
+            ['input-rows', 'input-cols', 'val-input'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    const btn = document.getElementById('btn-apply');
+                    btn.classList.add('animate-shake');
+                    btn.classList.remove('bg-primary');
+                    btn.classList.add('bg-red-600');
+                    if (appState.isSimulating) cancelSimulation();
+                });
+            });
+
+            setInputSubMode('decl'); // Trigger default
+            handleApply(); // Initial render
+        }
+
+        function setUIMode(mode) {
+            if (appState.isSimulating) cancelSimulation();
+            appState.uiMode = mode;
+
+            document.getElementById('tab-input').classList.toggle('tab-active', mode === 'input');
+            document.getElementById('tab-output').classList.toggle('tab-active', mode === 'output');
+
+            document.getElementById('panel-input').classList.toggle('hidden', mode !== 'input');
+            document.getElementById('panel-output').classList.toggle('hidden', mode !== 'output');
+
+            toggleMainButtons();
+            updateCodeSnippet();
+        }
+
+        function setInputSubMode(sub) {
+            if (appState.isSimulating) cancelSimulation();
+            appState.inputSubMode = sub;
+
+            document.getElementById('btn-sub-decl').classList.toggle('bg-primary/20', sub === 'decl');
+            document.getElementById('btn-sub-decl').classList.toggle('text-secondary', sub === 'decl');
+            document.getElementById('btn-sub-decl').classList.toggle('text-secondary/40', sub !== 'decl');
+            document.getElementById('btn-sub-cin').classList.toggle('bg-primary/20', sub === 'cin');
+            document.getElementById('btn-sub-cin').classList.toggle('text-secondary', sub === 'cin');
+            document.getElementById('btn-sub-cin').classList.toggle('text-secondary/40', sub !== 'cin');
+
+            document.getElementById('label-values').innerText = sub === 'decl' ? "Matrix Values (Format: {1,2},{3,4})" : "Input Buffer (cin Raw Data)";
+            document.getElementById('val-input').value = DEFAULTS[sub];
+            document.getElementById('btn-apply-text').innerText = sub === 'decl' ? "Apply & Declare" : "Initialize Grid for cin";
+
+            // Manual Apply Needed
+            const btn = document.getElementById('btn-apply');
+            btn.classList.add('animate-shake');
+            btn.classList.remove('bg-primary');
+            btn.classList.add('bg-red-600');
+
+            updateCodeSnippet();
+        }
+
+        function toggleMainButtons() {
+            const isInputMode = appState.uiMode === 'input';
+            const isCinSubMode = appState.inputSubMode === 'cin';
+
+            document.getElementById('btn-apply').classList.toggle('hidden', !isInputMode);
+
+            // Start Simulation Button
+            // If output mode: show Start Output
+            // If input mode & cin: show Start cin (if initialized)
+            const showStart = (appState.uiMode === 'output') || (appState.uiMode === 'input' && appState.inputSubMode === 'cin');
+            document.getElementById('btn-start-sim').classList.toggle('hidden', !showStart);
+        }
+
+        function handleApply() {
+            cancelSimulation();
+            appState.rows = parseInt(document.getElementById('input-rows').value) || 3;
+            appState.cols = parseInt(document.getElementById('input-cols').value) || 4;
+            const raw = document.getElementById('val-input').value;
+
+            document.getElementById('btn-apply').classList.remove('animate-shake', 'bg-red-600');
+            document.getElementById('btn-apply').classList.add('bg-primary');
+
+            if (appState.inputSubMode === 'decl') {
+                parseDeclaration(raw);
+            } else {
+                prepareCinBuffer(raw);
+            }
+
+            renderGrid();
+            updateCodeSnippet();
+            resetStatus();
+            toggleMainButtons();
+        }
+
+        function parseDeclaration(str) {
+            try {
+                let s = str.trim();
+                // Extremely robust parser for {1,2},{3,4}
+                s = s.replace(/\{/g, '[').replace(/\}/g, ']');
+                s = s.replace(/\s+/g, '');
+                s = s.replace(/,\s*\]/g, ']'); // Remove trailing commas in rows
+                s = s.replace(/\]\s*\[/g, '],['); // Ensure commas between rows
+
+                // Wrap in outer array if sequence of arrays like [1,2],[3,4]
+                let toParse = (s.startsWith('[') && !s.includes('],[')) ? s : `[${s.replace(/^\[+|\]+$/g, '')}]`;
+                // Wait, simplify: just wrap it and let flattened logic handle it
+                toParse = `[${s}]`.replace(/\[+/g, '[').replace(/\]+/g, ']'); // This is too aggressive
+
+                // Better way:
+                let dataToParse = s;
+                if (!s.startsWith('[') || !s.endsWith(']')) dataToParse = `[${s}]`;
+                else if (s.match(/\]\s*,?\s*\[/)) dataToParse = `[${s}]`;
+
+                let data = JSON.parse(dataToParse.replace(/\]\s*\[/g, '],[').replace(/,,/g, ','));
+
+                // Flatten excess nesting if user did {{1,2}} -> [[[1,2]]]
+                while (Array.isArray(data) && data.length === 1 && Array.isArray(data[0]) && Array.isArray(data[0][0])) {
+                    data = data[0];
+                }
+
+                // Ensure it's 2D
+                if (Array.isArray(data) && data.length > 0 && !Array.isArray(data[0])) {
+                    data = [data];
+                }
+
+                appState.gridData = data;
+                printConsole(`System: Declaration applied (${appState.rows}x${appState.cols}).`);
+            } catch (e) {
+                appState.gridData = [];
+                alert("Format Deklarasi Salah! Gunakan format C++: {1,2}, {3,4}");
+            }
+        }
+
+        function prepareCinBuffer(str) {
+            // Robust cin parser
+            appState.buffer = str.trim().split(/[\s,{}]+/).filter(x => x !== "").map(Number);
+            appState.gridData = Array.from({ length: appState.rows }, () => Array(appState.cols).fill('?'));
+            printConsole(`System: Buffer cin siap dengan ${appState.buffer.length} angka.`);
+        }
+
+        function renderGrid() {
+            const container = document.getElementById('grid-container');
+            let html = `<div class="flex flex-col gap-3">`;
+            for (let i = 0; i < appState.rows; i++) {
+                html += `<div class="flex gap-3">`;
+                for (let j = 0; j < appState.cols; j++) {
+                    const val = (appState.gridData[i] && appState.gridData[i][j] !== undefined) ? appState.gridData[i][j] : '?';
+                    const filled = val !== '?' ? 'cell-filled' : '';
+                    html += `<div id="cell-${i}-${j}" class="cell flex-1 h-14 bg-white/5 rounded-xl flex items-center justify-center font-mono font-bold text-lg text-secondary/60 ${filled}">${val}</div>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function manipulateElement() {
+            const r = parseInt(document.getElementById('search-row').value);
+            const c = parseInt(document.getElementById('search-col').value);
+            const newVal = document.getElementById('search-val').value.trim();
+
+            document.querySelectorAll('.cell').forEach(el => el.classList.remove('cell-target', 'cell-active'));
+            const cell = document.getElementById(`cell-${r}-${c}`);
+
+            if (cell) {
+                cell.classList.add('cell-target');
+                if (newVal !== "") {
+                    if (!appState.gridData[r]) appState.gridData[r] = [];
+                    appState.gridData[r][c] = newVal;
+                    cell.innerText = newVal;
+                    cell.classList.add('cell-filled');
+                    printConsole(`Update: grid[${r}][${c}] = ${newVal}`);
+                } else {
+                    const val = appState.gridData[r] ? appState.gridData[r][c] : '?';
+                    printConsole(`Info: grid[${r}][${c}] is ${val}`);
+                }
+            } else { alert("Indeks di luar jangkauan!"); }
+        }
+
+        // --- SIMULATION ---
+
+        function startSim() {
+            if (appState.isSimulating) cancelSimulation();
+
+            appState.simulationType = appState.uiMode === 'input' ? 'cin' : 'output';
+            appState.isSimulating = true;
+            appState.isPaused = false;
+            appState.currentI = 0;
+            appState.currentJ = -1;
+
+            clearConsole();
+            document.getElementById('sim-controls').classList.remove('hidden');
+            document.getElementById('main-actions').classList.add('opacity-30', 'pointer-events-none');
+
+            runStep();
+        }
+
+        function runStep() {
+            if (!appState.isSimulating || appState.isPaused) return;
+
+            if (appState.currentJ < appState.cols - 1) {
+                appState.currentJ++;
+                updateStatusUI();
+
+                document.querySelectorAll('.cell').forEach(c => c.classList.remove('cell-active', 'cell-target'));
+                const cell = document.getElementById(`cell-${appState.currentI}-${appState.currentJ}`);
+                if (cell) cell.classList.add('cell-active');
+
+                if (appState.simulationType === 'cin') {
+                    updateCodeSnippet('cl-l3');
+                    if (appState.buffer.length > 0) {
+                        const val = appState.buffer.shift();
+                        if (!appState.gridData[appState.currentI]) appState.gridData[appState.currentI] = [];
+                        appState.gridData[appState.currentI][appState.currentJ] = val;
+                        setTimeout(() => {
+                            cell.innerText = val;
+                            cell.classList.add('cell-filled');
+                            document.getElementById('val-input').value = appState.buffer.join(' ');
+                        }, 200);
+                    }
+                } else {
+                    updateCodeSnippet('cl-l3');
+                    const val = (appState.gridData[appState.currentI] && appState.gridData[appState.currentI][appState.currentJ] !== undefined) ? appState.gridData[appState.currentI][appState.currentJ] : '0';
+                    printConsole(`${val} `, false);
+                }
+
+                appState.timer = setTimeout(runStep, 2100 - getSpeed());
+            } else {
+                appState.currentJ = -1;
+                appState.currentI++;
+
+                if (appState.simulationType === 'output') {
+                    updateCodeSnippet('cl-l5');
+                    printConsole('\n', true);
+                }
+
+                if (appState.currentI < appState.rows) {
+                    updateCodeSnippet('cl-l1');
+                    appState.timer = setTimeout(runStep, 2100 - getSpeed());
+                } else {
+                    finishSimulation();
+                }
+            }
+        }
+
+        function stepSimulation() {
+            if (!appState.isSimulating) {
+                startSim();
+                pauseSimulation(); // Start but immediately pause so user can step
+                return;
+            }
+            if (!appState.isPaused) pauseSimulation();
+
+            appState.isPaused = false; // Temporarily unpause to run ONE step
+            runStep();
+            appState.isPaused = true; // Immediately pause again
+        }
+
+        function pauseSimulation() {
+            appState.isPaused = !appState.isPaused;
+            document.getElementById('btn-pause').innerText = appState.isPaused ? "Resume" : "Pause";
+            if (!appState.isPaused) runStep();
+        }
+
+        function cancelSimulation() {
+            clearTimeout(appState.timer);
+            appState.isSimulating = false;
+            document.getElementById('sim-controls').classList.add('hidden');
+            document.getElementById('main-actions').classList.remove('opacity-30', 'pointer-events-none');
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('cell-active'));
+            updateCodeSnippet();
+            resetStatus();
+        }
+
+        function finishSimulation() {
+            printConsole(`\nSystem: Selesai.`);
+            cancelSimulation();
+        }
+
+        // --- HELPERS ---
+
+        function updateCodeSnippet(activeLineId) {
+            const container = document.getElementById('code-snippet-container');
+            let code = ``;
+
+            if (appState.uiMode === 'input') {
+                if (appState.inputSubMode === 'decl') {
+                    code = `<div id="cl-decl">int grid[${appState.rows}][${appState.cols}] = { ${appState.gridData.length ? '{...}' : ''} };</div>`;
+                } else {
+                    code = `<div id="cl-l1">for (int i = 0; i < ${appState.rows}; i++) {</div><div id="cl-l2" class="pl-4">for (int j = 0; j < ${appState.cols}; j++) {</div><div id="cl-l3" class="pl-8 text-primary font-bold">cin >> grid[i][j];</div><div id="cl-l4" class="pl-4">}</div><div id="cl-l5">}</div>`;
+                }
+            } else {
+                code = `<div id="cl-l1">for (int i = 0; i < ${appState.rows}; i++) {</div><div id="cl-l2" class="pl-4">for (int j = 0; j < ${appState.cols}; j++) {</div><div id="cl-l3" class="pl-8 text-primary font-bold">cout << grid[i][j] << " ";</div><div id="cl-l4" class="pl-4">}</div><div id="cl-l5" class="pl-4 text-primary font-bold">cout << endl;</div><div id="cl-l6">}</div>`;
+            }
+
+            container.innerHTML = code;
+            if (activeLineId) {
+                const el = document.getElementById(activeLineId);
+                if (el) el.classList.add('code-highlight');
+            }
+        }
+
+        function updateStatusUI() {
+            document.getElementById('status-i').innerText = appState.currentI;
+            document.getElementById('status-j').innerText = appState.currentJ;
+        }
+
+        function resetStatus() {
+            document.getElementById('status-i').innerText = "?";
+            document.getElementById('status-j').innerText = "?";
+        }
+
+        function getSpeed() { return parseInt(document.getElementById('sim-speed').value); }
+        function printConsole(text, newline = true) {
+            const out = document.getElementById('console-out');
+            if (newline) out.innerText += `\n> ${text}`;
+            else out.innerText += text;
+            out.scrollTop = out.scrollHeight;
+        }
+        function clearConsole() { document.getElementById('console-out').innerText = ""; }
+
+        init();
+    </script>
+</body>
+
+</html>
