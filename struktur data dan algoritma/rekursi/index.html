@@ -55,7 +55,7 @@
         .stack-frame {
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .mem-block {
             transition: all 0.3s ease;
         }
@@ -86,7 +86,8 @@
             </a>
             <div class="flex gap-2 bg-black/40 p-1 rounded-xl border border-white/5">
                 <a href="index.html"
-                    class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-primary/20 text-primary border border-primary/30">Compare Mode</a>
+                    class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-primary/20 text-primary border border-primary/30">Compare
+                    Mode</a>
             </div>
         </div>
     </nav>
@@ -94,10 +95,21 @@
     <div class="max-w-7xl mx-auto w-full flex-grow flex flex-col pt-4">
         <header class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-                <h1 class="text-3xl font-bold">Iterative <span class="text-secondary/50">vs</span> Recursive <span class="text-primary italic">Faktorial</span></h1>
-                <p class="text-sm text-secondary/50 mt-1">Perbandingan Eksekusi Program dan Penggunaan Memori (Stack Call)</p>
+                <a href="../../index.html"
+                    class="text-primary hover:text-red-400 flex items-center gap-2 mb-2 transition-colors group">
+                    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span class="text-xs font-bold uppercase tracking-widest">Dashboard</span>
+                </a>
+                <h1 class="text-3xl font-bold">Iterative <span class="text-secondary/50">vs</span> Recursive <span
+                        class="text-primary italic">Faktorial</span></h1>
+                <p class="text-sm text-secondary/50 mt-1">Perbandingan Eksekusi Program dan Penggunaan Memori (Stack
+                    Call)</p>
             </div>
-            
+
             <div class="flex items-center gap-4 bg-dark-lighter border border-white/5 p-2 rounded-2xl shadow-xl">
                 <div class="px-4">
                     <label class="text-[9px] uppercase text-secondary/40 font-bold block mb-1">Input N</label>
@@ -106,7 +118,13 @@
                 </div>
                 <button onclick="startComparison()" id="start-btn"
                     class="bg-primary text-secondary px-6 py-3 rounded-xl text-xs font-bold uppercase hover:bg-red-800 transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                     Play Comparison
                 </button>
             </div>
@@ -114,19 +132,22 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow min-h-[600px]">
             <!-- Iterative Panel -->
-            <div class="bg-dark-lighter border border-white/5 rounded-[2.5rem] p-6 shadow-2xl flex flex-col relative overflow-hidden h-full">
+            <div
+                class="bg-dark-lighter border border-white/5 rounded-[2.5rem] p-6 shadow-2xl flex flex-col relative overflow-hidden h-full">
                 <!-- Header Icon -->
                 <div class="absolute top-6 right-6 text-3xl opacity-20">🧑‍🍳🍽️</div>
-                
+
                 <div class="mb-4">
                     <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
                         <span>Iterative (Looping)</span>
                     </h2>
-                    <p class="text-[10px] uppercase tracking-widest text-secondary/40 mt-1 font-bold">O(N) Time | O(1) Space</p>
+                    <p class="text-[10px] uppercase tracking-widest text-secondary/40 mt-1 font-bold">O(N) Time | O(1)
+                        Space</p>
                 </div>
 
                 <!-- Code Block -->
-                <div class="bg-black/40 rounded-xl p-4 font-mono text-[11px] md:text-xs text-left leading-relaxed border border-white/5 text-secondary/60 mb-6 font-bold shadow-inner">
+                <div
+                    class="bg-black/40 rounded-xl p-4 font-mono text-[11px] md:text-xs text-left leading-relaxed border border-white/5 text-secondary/60 mb-6 font-bold shadow-inner">
                     <div id="iter-l1" class="code-line">int Faktorial(int n) {</div>
                     <div id="iter-l2" class="code-line ml-4">int hasil = 1;</div>
                     <div id="iter-l3" class="code-line ml-4">for (int i = 1; i &lt;= n; i++) {</div>
@@ -138,19 +159,23 @@
 
                 <!-- Visualizer Area -->
                 <div class="flex-grow flex flex-col bg-black/20 rounded-2xl border border-white/5 p-6 relative">
-                    <h3 class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-secondary/30">Variabel Memory</h3>
-                    
+                    <h3 class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-secondary/30">
+                        Variabel Memory</h3>
+
                     <div class="flex-grow flex flex-col justify-center gap-8 max-w-[250px] mx-auto w-full">
                         <!-- Variables -->
-                        <div class="flex items-center justify-between bg-dark border border-white/10 rounded-xl p-4 var-box" id="var-n-box">
+                        <div class="flex items-center justify-between bg-dark border border-white/10 rounded-xl p-4 var-box"
+                            id="var-n-box">
                             <span class="font-mono text-secondary/50 text-xs font-bold">n</span>
                             <span class="font-mono text-emerald-400 text-lg font-bold" id="iter-n">-</span>
                         </div>
-                        <div class="flex items-center justify-between bg-dark border border-white/10 rounded-xl p-4 var-box" id="var-i-box">
+                        <div class="flex items-center justify-between bg-dark border border-white/10 rounded-xl p-4 var-box"
+                            id="var-i-box">
                             <span class="font-mono text-secondary/50 text-xs font-bold">i (iterator)</span>
                             <span class="font-mono text-emerald-400 text-lg font-bold" id="iter-i">-</span>
                         </div>
-                        <div class="flex items-center justify-between bg-dark border border-white/10 rounded-xl p-4 var-box" id="var-hasil-box">
+                        <div class="flex items-center justify-between bg-dark border border-white/10 rounded-xl p-4 var-box"
+                            id="var-hasil-box">
                             <span class="font-mono text-secondary/50 text-xs font-bold">hasil</span>
                             <span class="font-mono text-emerald-400 text-lg font-bold" id="iter-hasil">-</span>
                         </div>
@@ -170,19 +195,22 @@
             </div>
 
             <!-- Recursive Panel -->
-            <div class="bg-dark-lighter border border-white/5 rounded-[2.5rem] p-6 shadow-2xl flex flex-col relative overflow-hidden h-full">
+            <div
+                class="bg-dark-lighter border border-white/5 rounded-[2.5rem] p-6 shadow-2xl flex flex-col relative overflow-hidden h-full">
                 <!-- Header Icon -->
                 <div class="absolute top-6 right-6 text-3xl opacity-20 transform scale-x-[-1]">🪆</div>
-                
+
                 <div class="mb-4 text-right md:text-left">
                     <h2 class="text-xl font-bold text-primary flex items-center justify-end md:justify-start gap-2">
                         <span>Recursive (Stack)</span>
                     </h2>
-                    <p class="text-[10px] uppercase tracking-widest text-secondary/40 mt-1 font-bold">O(N) Time | O(N) Space</p>
+                    <p class="text-[10px] uppercase tracking-widest text-secondary/40 mt-1 font-bold">O(N) Time | O(N)
+                        Space</p>
                 </div>
 
                 <!-- Code Block -->
-                <div class="bg-black/40 rounded-xl p-4 font-mono text-[11px] md:text-xs text-left leading-relaxed border border-white/5 text-secondary/60 mb-6 font-bold shadow-inner">
+                <div
+                    class="bg-black/40 rounded-xl p-4 font-mono text-[11px] md:text-xs text-left leading-relaxed border border-white/5 text-secondary/60 mb-6 font-bold shadow-inner">
                     <div id="rec-l1" class="code-line">int Faktorial(int n) {</div>
                     <div id="rec-l2" class="code-line ml-4">if (n &lt;= 1) {</div>
                     <div id="rec-l3" class="code-line ml-8">return 1;</div>
@@ -193,9 +221,12 @@
                 </div>
 
                 <!-- Visualizer Area -->
-                <div class="flex-grow flex flex-col bg-black/20 rounded-2xl border border-white/5 p-4 relative overflow-hidden">
-                    <h3 class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-secondary/30 z-10">Call Stack (Memory)</h3>
-                    
+                <div
+                    class="flex-grow flex flex-col bg-black/20 rounded-2xl border border-white/5 p-4 relative overflow-hidden">
+                    <h3
+                        class="absolute top-4 left-4 text-[9px] font-bold uppercase tracking-widest text-secondary/30 z-10">
+                        Call Stack (Memory)</h3>
+
                     <div class="flex-grow overflow-y-auto custom-scrollbar flex flex-col justify-end pt-12 pb-2">
                         <!-- Stack items prepended here -->
                         <div id="stack-inner" class="flex flex-col w-full max-w-[250px] mx-auto mt-auto gap-2"></div>
@@ -269,8 +300,8 @@
             await sleep(speed);
 
             highlightIter([3]);
-            await sleep(speed/2);
-            
+            await sleep(speed / 2);
+
             for (let i = 1; i <= n; i++) {
                 highlightIter([3]);
                 await pulseVar('iter-i', i);
@@ -285,7 +316,7 @@
             highlightIter([6]);
             await pulseVar('iter-hasil', `${hasil} (RETURN)`);
             await sleep(speed);
-            
+
             highlightIter([]);
         }
 
@@ -301,10 +332,10 @@
         async function callRecursiveStep(n) {
             recCallCount++;
             const currentMemIdx = recCallCount;
-            
+
             // Memory Allocation for frame
             updateRecMem(recCallCount);
-            
+
             // Add stack frame UI
             const stackId = `stack-${n}-${Date.now()}`;
             const stackInner = document.getElementById('stack-inner');
@@ -339,16 +370,16 @@
                 stackFrame.querySelector('.status').classList.replace('text-orange-400', 'text-emerald-400');
                 stackFrame.querySelector('.ret-val').innerText = '1';
                 stackFrame.querySelector('.ret-val').classList.replace('text-secondary/30', 'text-emerald-500');
-                
+
                 await sleep(speed * 1.5);
-                
+
                 // Mark as completed instead of popping
                 stackFrame.classList.replace('bg-emerald-500/10', 'bg-emerald-900/20');
                 stackFrame.classList.replace('border-l-emerald-500', 'border-l-emerald-900');
                 stackFrame.querySelector('.status').innerText = 'RETURNED';
                 stackFrame.querySelector('.status').classList.replace('text-emerald-400', 'text-secondary/40');
                 stackFrame.classList.add('opacity-60', 'scale-95');
-                
+
                 recCallCount--;
                 updateRecMem(recCallCount);
                 return 1;
@@ -358,7 +389,7 @@
             stackFrame.querySelector('.status').innerText = 'WAITING';
             stackFrame.querySelector('.status').classList.replace('text-orange-400', 'text-secondary/60');
             stackFrame.classList.replace('bg-primary/10', 'bg-black/30');
-            
+
             await sleep(speed);
 
             const childRes = await callRecursiveStep(n - 1);
@@ -368,11 +399,11 @@
             stackFrame.classList.replace('bg-black/30', 'bg-primary/20');
             stackFrame.querySelector('.status').innerText = 'RETURNING';
             stackFrame.querySelector('.status').classList.replace('text-secondary/60', 'text-primary');
-            
+
             const myRes = n * childRes;
             stackFrame.querySelector('.ret-val').innerText = `${n} * ${childRes} = ${myRes}`;
             stackFrame.querySelector('.ret-val').classList.replace('text-secondary/30', 'text-white');
-            
+
             await sleep(speed * 1.5);
 
             // Mark as completed instead of popping
@@ -381,21 +412,21 @@
             stackFrame.querySelector('.status').innerText = 'RETURNED';
             stackFrame.querySelector('.status').classList.replace('text-primary', 'text-secondary/40');
             stackFrame.classList.add('opacity-60', 'scale-95');
-            
+
             recCallCount--;
             updateRecMem(recCallCount);
-            
+
             return myRes;
         }
 
         function updateRecMem(frameCount) {
             const memBar = document.getElementById('rec-mem-bar');
             memBar.innerHTML = '';
-            for(let i=0; i<frameCount; i++) {
+            for (let i = 0; i < frameCount; i++) {
                 const block = document.createElement('div');
                 block.className = 'h-full bg-primary flex-1 mem-block opacity-0';
                 memBar.appendChild(block);
-                setTimeout(()=>block.classList.remove('opacity-0'), 50);
+                setTimeout(() => block.classList.remove('opacity-0'), 50);
             }
             document.getElementById('rec-mem-size').innerText = `${frameCount} FRAMES`;
         }
@@ -403,12 +434,12 @@
         async function startComparison() {
             if (isAnimating) return;
             const nVal = parseInt(document.getElementById('input-n').value);
-            
+
             if (isNaN(nVal) || nVal < 1 || nVal > 10) {
                 alert("Masukkan nilai N yang valid (1 - 10)");
                 return;
             }
-            
+
             isAnimating = true;
             const btn = document.getElementById('start-btn');
             btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Running...`;

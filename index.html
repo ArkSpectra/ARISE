@@ -153,18 +153,22 @@
 
     <script>
         const materials = [
-            { name: "Array", difficulty: "Beginner", icon: "📦" },
+            { name: "Array (Satu Dimensi)", difficulty: "Beginner", icon: "📦" },
+            { name: "String", difficulty: "Beginner", icon: "🔤" },
             { name: "Struct", difficulty: "Beginner", icon: "📑" },
             { name: "Pair", difficulty: "Beginner", icon: "👥" },
-            { name: "Array 2D", difficulty: "Easy", icon: "📊" },
+            { name: "Array Dua Dimensi", difficulty: "Easy", icon: "📊" },
             { name: "Vector", difficulty: "Easy", icon: "➡️" },
+            { name: "Sorting (Pengurutan)", difficulty: "Easy", icon: "🔄" },
+            { name: "Searching (Pencarian)", difficulty: "Easy", icon: "🔍" },
+            { name: "Rekursif", difficulty: "Medium", icon: "🔁" },
             { name: "Linked List", difficulty: "Medium", icon: "🔗" },
-            { name: "Stack", difficulty: "Medium", icon: "📚" },
+            { name: "Stack (Tumpukan)", difficulty: "Medium", icon: "📚" },
             { name: "Set", difficulty: "Medium", icon: "🧮" },
             { name: "Map", difficulty: "Medium", icon: "🗺️" },
-            { name: "Queue", difficulty: "Medium", icon: "🔄" },
+            { name: "Queue (Antrean)", difficulty: "Medium", icon: "🔄" },
             { name: "Priority Queue", difficulty: "Hard", icon: "⚡" },
-            { name: "Tree", difficulty: "Hard", icon: "🌲" },
+            { name: "Tree (Pohon)", difficulty: "Hard", icon: "🌲" },
             { name: "Graph", difficulty: "Extreme", icon: "🕸️" }
         ];
 
@@ -173,8 +177,9 @@
         function renderCards() {
             grid.innerHTML = materials.map((m, index) => {
                 let action = `showDetail('${m.name}')`;
-                if (m.name === "Array 2D") action = `window.location.href='./struktur data dan algoritma/array 2d/index.html'`;
+                if (m.name === "Array Dua Dimensi") action = `window.location.href='./struktur data dan algoritma/array 2d/index.html'`;
                 if (m.name === "Vector") action = `window.location.href='./struktur data dan algoritma/vector/1d/index.html'`;
+                if (m.name === "Rekursif") action = `window.location.href='./struktur data dan algoritma/rekursi/index.html'`;
                 return `
                 <div onclick="${action}" class="glass-card p-6 rounded-3xl hover:-translate-y-2 transition-all cursor-pointer group neon-border-hover animate-fade-in" style="animation-delay: ${index * 0.05}s">
                     <div class="flex justify-between items-start mb-6">
